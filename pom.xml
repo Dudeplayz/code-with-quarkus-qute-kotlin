@@ -17,7 +17,23 @@
     <quarkus.platform.group-id>io.quarkus.platform</quarkus.platform.group-id>
     <quarkus.platform.version>2.2.3.Final</quarkus.platform.version>
     <surefire-plugin.version>3.0.0-M5</surefire-plugin.version>
+    <vaadin.version>14.6.8</vaadin.version>
+    <vertx-vaadin-flow.version>14.4.1</vertx-vaadin-flow.version>
+    <vaadin-flow-sockjs.classifier>vaadin-${vaadin.version}</vaadin-flow-sockjs.classifier>
+    <jakarta.servlet-api.version>5.0.0</jakarta.servlet-api.version>
   </properties>
+  <repositories>
+    <repository>
+      <id>vertx-vaadin-public</id>
+      <url>https://mcollovati.jfrog.io/artifactory/vertx-vaadin-public</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
+  </repositories>
   <dependencyManagement>
     <dependencies>
       <dependency>
@@ -30,6 +46,72 @@
     </dependencies>
   </dependencyManagement>
   <dependencies>
+    <dependency>
+      <groupId>org.jboss.slf4j</groupId>
+      <artifactId>slf4j-jboss-logmanager</artifactId>
+    </dependency>
+    <!--  Vaadin  -->
+    <dependency>
+      <groupId>com.vaadin</groupId>
+      <!-- Replace artifactId with vaadin-core to use only free components -->
+      <artifactId>vaadin-core</artifactId>
+      <version>${vaadin.version}</version>
+      <exclusions>
+        <!-- vaadin-vertx exclusions -->
+        <exclusion>
+          <groupId>com.vaadin</groupId>
+          <artifactId>flow-push</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>com.vaadin</groupId>
+          <artifactId>flow-client</artifactId>
+        </exclusion>
+        <!-- Webjars are only needed when running in Vaadin 13 compatibility mode -->
+        <exclusion>
+          <groupId>com.vaadin.webjar</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.webjars.bowergithub.insites</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.webjars.bowergithub.polymer</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.webjars.bowergithub.polymerelements</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.webjars.bowergithub.vaadin</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.webjars.bowergithub.webcomponents</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
+    <!--  vaadin-vertx  -->
+    <dependency>
+      <groupId>com.github.mcollovati.vertx</groupId>
+      <artifactId>vertx-vaadin-flow</artifactId>
+      <version>${vertx-vaadin-flow.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.github.mcollovati.vertx</groupId>
+      <artifactId>vaadin-flow-sockjs</artifactId>
+      <version>${vertx-vaadin-flow.version}</version>
+      <classifier>${vaadin-flow-sockjs.classifier}</classifier>
+    </dependency>
+    <dependency>
+      <groupId>jakarta.servlet</groupId>
+      <artifactId>jakarta.servlet-api</artifactId>
+      <version>${jakarta.servlet-api.version}</version>
+      <scope>runtime</scope>
+    </dependency>
     <dependency>
       <groupId>io.quarkus</groupId>
       <artifactId>quarkus-resteasy-reactive-qute</artifactId>
@@ -45,6 +127,10 @@
     <dependency>
       <groupId>io.quarkus</groupId>
       <artifactId>quarkus-resteasy-reactive</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-vertx</artifactId>
     </dependency>
     <dependency>
       <groupId>io.quarkus</groupId>
@@ -70,6 +156,22 @@
     <sourceDirectory>src/main/kotlin</sourceDirectory>
     <testSourceDirectory>src/test/kotlin</testSourceDirectory>
     <plugins>
+      <plugin>
+        <groupId>com.vaadin</groupId>
+        <artifactId>vaadin-maven-plugin</artifactId>
+        <version>${vaadin.version}</version>
+        <configuration>
+          <!--<pnpmEnable>true</pnpmEnable>-->
+        </configuration>
+        <executions>
+          <execution>
+            <phase>compile</phase>
+            <goals>
+              <goal>prepare-frontend</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
       <plugin>
         <groupId>${quarkus.platform.group-id}</groupId>
         <artifactId>quarkus-maven-plugin</artifactId>
