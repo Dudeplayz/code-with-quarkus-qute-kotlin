@@ -21,11 +21,11 @@ class UIVerticle : VaadinVerticle() {
 
     override fun start(startFuture: Promise<Void>) {
         logger.info("Start init")
-        startFuture.future().onFailure { logger.error(it.cause) }
         super.start(startFuture)
     }
 
     override fun config(): JsonObject {
+        logger.info("httpPort: $port")
         return super.config().put("httpPort", port.toInt())
     }
 
